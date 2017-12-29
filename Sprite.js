@@ -8,6 +8,7 @@ function Sprite(options) {
     this.col = options.col || 0;
     this.velocity = options.velocity || 0.01;
     this.scale = options.scale || 1;
+    this.hideCollisionBox = true;
 
     this.context = options.context;
     this.width = options.width;
@@ -78,20 +79,42 @@ Sprite.prototype.moveDown = function () {
     this.y += this.height * this.velocity;
     // this.y += this.CHAR_WIDTH * 0.085;
 }
+
+Sprite.prototype.showCollisionBox = function(){
+    this.hideCollisionBox = false;
+}
+
 Sprite.prototype.draw = function () {
     var self = this;
-    this.context.clearRect(0, 0, this.width, this.height);
+    this.context.clearRect(0, 0, this.width * this.scale, this.height * this.scale);
 
-    // Draw the animation
+    if(!this.hideCollisionBox){
+
+   
+// this.context.fillRect(0,0,this.width * this.scale, this.height * this.scale );
+// this.context.fillStyle = 'rgba(225,225,225,0.5)';
+
+        this.context.strokeStyle = "#ff0000";
+        this.context.lineWidth   = 2;
+        this.context.strokeRect(this.x,this.y,this.width * this.scale / this.numberOfFrames, this.height * this.scale );
+
+
+        this.context.font = "12px Arial";
+        this.context.fillText(`X: ${this.x.toFixed(2)} Y: ${this.y.toFixed(2)}`,this.x + 3,this.y + 13);
+        this.context.fillText(`w: ${this.width.toFixed(2)} h: ${this.height.toFixed(2)}`,this.x + this.width * 0.01 * this.scale / this.numberOfFrames,this.y + this.height * this.scale);
+    }
+    // Draw the animation   
     if (this.image.ready)
         this.context.drawImage(
-            this.image,
-            this.frameIndex * this.width / this.numberOfFrames,
-            this.height * this.col,
-            this.width / this.numberOfFrames,
-            this.height,
-            this.x,
-            this.y,
-            this.width * this.scale / this.numberOfFrames,
-            this.height * this.scale);
+            this.image, // Image File
+            this.frameIndex * this.width / this.numberOfFrames, // source x
+            this.height * this.col, // source y
+            this.width / this.numberOfFrames, // source height
+            this.height, // source width
+            this.x,// destination x
+            this.y, // destination y
+            this.width * this.scale / this.numberOfFrames, // destination height
+            this.height * this.scale); // destination width
+
+            // this.context.globalCompositeOperation = "source-over";
 }

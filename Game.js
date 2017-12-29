@@ -1,14 +1,10 @@
-function Game(options){
-    if(!(this instanceof Game))
+function Game(options) {
+    if (!(this instanceof Game))
         return new Game(options);
     this._config(options);
-    // while(!this.stoped()){
-    //     this.update();
-    //     this.draw();
-    // }
 }
 
-Game.prototype._config = function ( options ){
+Game.prototype._config = function (options) {
     let self = this;
     options = options || {};
     this.name = options.name;
@@ -17,70 +13,84 @@ Game.prototype._config = function ( options ){
     this.height = options.height;
     this.i = 0;
 }
+Game.prototype.getWidth = function(){
+    return this.width;
+}
 
-Game.prototype.draw = function(context){
+Game.prototype.draw = function (context) {
     var self = this;
     // console.log('draw');
     this.context.clearRect(0, 0, this.width, this.height);
-    this.player.draw(this.context);
+    // this.player.draw(this.context);
+    // this.player2.draw(this.context);
+    for (player of this.players){
+        player.draw(this.context);
+    }
 }
 
-Game.prototype.update = function(){
+Game.prototype.update = function () {
     // console.log('update');
 }
 
-Game.prototype.run = function() {
+Game.prototype.run = function () {
     var self = this;
     this.loops = 0;
     this.skipTicks = 1000 / this.fps;
     this.maxFrameSkip = 10,
-    this.nextGameTick = this.nextGameTick ? this.nextGameTick : (new Date).getTime();
+        this.nextGameTick = this.nextGameTick ? this.nextGameTick : (new Date).getTime();
     this.lastGameTick;
 
 
-      while ((new Date).getTime() > this.nextGameTick) {
+    while ((new Date).getTime() > this.nextGameTick) {
         self.update();
         self.nextGameTick += self.skipTicks;
-        self.loops++;      
-      }
-      if (this.loops) self.draw();
- 
-  };
+        self.loops++;
+    }
+    if (this.loops) self.draw();
 
-Game.prototype.stoped = function(){
-    if(this.i > 1001)
+};
+
+Game.prototype.stoped = function () {
+    if (this.i > 1001)
         return true;
     ++this.i;
     return false;
 }
 
-Game.prototype.start = function() {
+
+Game.prototype.start = function () {
     let self = this;
     this.canvas = document.createElement("canvas");
     this.canvas.width = this.width;
     this.canvas.height = this.height;
 
+    document.body.appendChild(this.canvas); 
     this.context = this.canvas.getContext("2d");
 
-    document.body.appendChild(this.canvas);
+    this.players = [];
+    for (let i = 1; i <= 2; i++ ){
+        this.players.push(new Player(this.context, i + i/11))
+    }
+    // this.player = new Player(this.context, 1);
+    // this.player.showCollisionBox();
+    // this.player2 = new Player(this.context, 1.2);
 
-    this.player = new Player(this.context);
-
+    // this.player2.showCollisionBox();
     this._onEachFrame(this.run.bind(this));
-  };
+};
 
-Game.prototype._onEachFrame = (function(cb){
+Game.prototype._onEachFrame = (function (cb) {
     let self = this;
     var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame;
-    
+
     if (requestAnimationFrame) {
-        return function(cb) {
-        var _cb = function() { cb(); requestAnimationFrame(_cb); }
-        _cb();
+        return function (cb) {
+            var _cb = function () { cb(); requestAnimationFrame(_cb); }
+            _cb();
         };
     } else {
-        return function(cb) {
-        setInterval(cb, 1000 / self.fps);
+        return function (cb) {
+            setInterval(cb, 1000 / self.fps);
         }
     }
 })();
@@ -109,7 +119,7 @@ Game.prototype._onEachFrame = (function(cb){
 //       }
 //     }
 //   })();
-  
+
 //   Game.start = function() {
 //     Game.canvas = document.createElement("canvas");
 //     Game.canvas.width = Game.width;
@@ -123,7 +133,7 @@ Game.prototype._onEachFrame = (function(cb){
 
 //     Game._onEachFrame(Game.run);
 //   };
-  
+
 //   Game.run = (function() {
 //     var loops = 0, skipTicks = 1000 / Game.fps,
 //         maxFrameSkip = 10,
@@ -142,31 +152,30 @@ Game.prototype._onEachFrame = (function(cb){
 //       if (loops) Game.draw();
 //     }
 //   })();
-  
+
 //   Game.draw = function() {
 //     Game.context.clearRect(0, 0, Game.width, Game.height);
 //     Game.player.draw(Game.context);
 //   };
-  
+
 //   Game.update = function() { };
-  
-  window.addEventListener('keydown', function(event) {
-    switch (event.keyCode) {
-      case 37: // Left
-        a.player.moveLeft();
-      break;
 
-      case 38: // Up
-        a.player.moveUp();
-      break;
+// window.addEventListener('keydown', function (event) {
+//     switch (event.keyCode) {
+//         case 37: // Left
+//             a.player.moveLeft();
+//             break;
 
-      case 39: // Right
-        a.player.moveRight();
-      break;
+//         case 38: // Up
+//             a.player.moveUp();
+//             break;
 
-      case 40: // Down
-        a.player.moveDown();
-      break;
-    }
-  }, false);
-  
+//         case 39: // Right
+//             a.player.moveRight();
+//             break;
+
+//         case 40: // Down
+//             a.player.moveDown();
+//             break;
+//     }
+// }, false);
